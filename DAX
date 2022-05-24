@@ -1,0 +1,34 @@
+Remark #(Sharp Sign) Represents Measure/Column, @ Represents Table
+
+---Previous Selected Period---
+
+Measure = 
+Var Start_date = CALCULATE(min('Calendar'[Date]),ALLSELECTED('Calendar'[Date]))
+Var End_date =  CALCULATE(max('Calendar'[Date]),ALLSELECTED('Calendar'[Date]))
+Var Result = CALCULATE(#,DATESBETWEEN('Calendar'[Date],date(year(start_date),month(Start_date),1),EOMONTH(date(year(End_date),month(End_date),1),0)))
+Return if(ISBLANK(Result),0,Result)
+
+---Accumulative Function---
+
+Measure = 
+Var Result = CALCULATE (
+    #,
+    FILTER (
+        ALL('Calendar'[Date]),
+        'Calendar'[Date] <= max('Calendar'[Date])
+)) -
+CALCULATE (
+    #,
+    FILTER (
+        ALL('Calendar'[Date]),
+        'Calendar'[Date] < date(year(max('Calendar'[Date])),month(max('Calendar'[Date])),1)
+))
+Return Result
+
+---Max/Min/AVG/MEAN Previos Period of Selected Period---
+
+Measure = 
+Var Start_date = CALCULATE(min('Calendar'[Date]),ALLSELECTED('Calendar'[Date]))
+Var End_date =  CALCULATE(max('Calendar'[Date]),ALLSELECTED('Calendar'[Date]))
+Var Result = CALCULATE(minx(SUMMARIZE(@,ReferenceDate,"Column Name",#),#),DATESBETWEEN('Calendar'[Date],date(year(Start_date)-1,month(Start_date),day(Start_date)),EOMONTH(date(year(End_date)-1,month(End_date),day(End_date)),0)))
+Return Result
